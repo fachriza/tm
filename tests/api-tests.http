@@ -1,0 +1,91 @@
+### ==============================================================================
+### User Management CRUD API Test Suite
+### Compatible with both ASP.NET Core (port 5000) and Golang Gin (port 8080)
+### ==============================================================================
+
+@baseUrl = http://localhost:5000
+# Switch to Gin by toggling the comment:
+# @baseUrl = http://localhost:8080
+
+### 1. Retrieve all users (Initially empty)
+GET {{baseUrl}}/api/users
+Accept: application/json
+
+### 2. Create a User - Failure (Validation error: missing FirstName and invalid email)
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "Doe",
+  "email": "invalid-email-address"
+}
+
+### 3. Create User 1 - Success (201 Created)
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com"
+}
+
+### 4. Create User 2 - Success (201 Created)
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "email": "jane.smith@example.com"
+}
+
+### 5. Create User - Failure (Duplicate Email Conflict - 409 Conflict)
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Duplicate",
+  "lastName": "User",
+  "email": "john.doe@example.com"
+}
+
+### 6. Retrieve all users (Should contain 2 users)
+GET {{baseUrl}}/api/users
+Accept: application/json
+
+### 7. Retrieve single user by ID (200 OK)
+GET {{baseUrl}}/api/users/1
+Accept: application/json
+
+### 8. Retrieve non-existent user by ID (404 Not Found)
+GET {{baseUrl}}/api/users/999
+Accept: application/json
+
+### 9. Update existing user (200 OK)
+PUT {{baseUrl}}/api/users/1
+Content-Type: application/json
+
+{
+  "firstName": "Johnathan",
+  "lastName": "Doe",
+  "email": "johnathan.updated@example.com"
+}
+
+### 10. Update user with conflicting email (409 Conflict)
+PUT {{baseUrl}}/api/users/1
+Content-Type: application/json
+
+{
+  "firstName": "Johnathan",
+  "lastName": "Doe",
+  "email": "jane.smith@example.com"
+}
+
+### 11. Delete user by ID (204 No Content)
+DELETE {{baseUrl}}/api/users/1
+
+### 12. Retrieve deleted user (404 Not Found)
+GET {{baseUrl}}/api/users/1
+Accept: application/json
